@@ -19,8 +19,7 @@ const useUserApiStore = create(
           const errorMessage =
             error?.response?.data?.message ||
             "Login Failed! Please check your credentials.";
-          toast.error(error?.error);
-          console.log(error);
+          toast.error(errorMessage);
         }
       },
 
