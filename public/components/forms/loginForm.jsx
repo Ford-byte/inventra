@@ -3,10 +3,11 @@
 import Image from "next/image";
 import { useState } from "react";
 import useUserApiStore from "../store/useUserApi";
-import RegisterForm from "./registerForm";
+import { useRouter } from "next/navigation";
 
 export default function LoginForm({ onClick, toggleRegister }) {
   const { userLogin } = useUserApiStore();
+  const router = useRouter();
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -15,6 +16,7 @@ export default function LoginForm({ onClick, toggleRegister }) {
     e.preventDefault();
     const response = await userLogin({ username, password });
     if (response) {
+      router.push(`/dashboard`);
     }
   };
 
