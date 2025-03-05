@@ -7,7 +7,7 @@ export default function Page() {
       <h2 className="text-center font-black py-[12px] text-xl uppercase p-4">
         Suppliers
       </h2>
-      <div className="flex flex-col gap-y-[12px] container px-[6px]">
+      <div className="flex flex-col gap-y-[12px] container px-[6px] pb-[70px]">
         <div className="shadow-lg rounded-lg border border-gray-200 p-4">
           <h4 className="font-black text-lg">RICE SUPPLY</h4>
           <h5 className="uppercase text-sm">

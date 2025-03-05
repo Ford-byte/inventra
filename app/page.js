@@ -1,15 +1,24 @@
 "use client";
 
 import LoginForm from "@/public/components/forms/loginForm";
+import RegisterForm from "@/public/components/forms/registerForm";
 import Image from "next/image";
 import { useState } from "react";
 
 export default function Home() {
   const [showLogin, setShowLogin] = useState(false);
+  const [showRegister, setShowRegister] = useState(false);
 
   const toggleLogin = () => {
     setShowLogin(!showLogin);
+    if (showRegister) setShowRegister(false);
   };
+
+  const toggleRegister = () => {
+    setShowRegister(!showRegister);
+    if (showLogin) setShowLogin(false); 
+  };
+
   return (
     <div className="">
       <div className="full-center !h-screen">
@@ -24,16 +33,20 @@ export default function Home() {
       <div className="fixed bottom-[24px] w-full flex justify-center flex-col items-center gap-y-[24px]">
         <div
           className="border border-gray-500 px-[24px] py-[12px] rounded-full text-sm font-[700] pointer"
-          onClick={() => {
-            toggleLogin();
-          }}
+          onClick={toggleLogin}
         >
           LOG IN
         </div>
         <h2 className="text-xs">Gina's Store</h2>
       </div>
 
-      {showLogin && <LoginForm onClick={toggleLogin} />}
+      {showLogin && (
+        <LoginForm onClick={toggleLogin} toggleRegister={toggleRegister} />
+      )}
+
+      {showRegister && (
+        <RegisterForm onClick={toggleRegister} toggleLogin={toggleLogin} />
+      )}
     </div>
   );
 }
