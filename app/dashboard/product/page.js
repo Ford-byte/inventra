@@ -13,7 +13,7 @@ export default function Page() {
         />
       </div>
       {/*  */}
-      <div className="flex flex-col gap-y-[6px] py-[12px]">
+      <div className="flex flex-col gap-y-[6px] py-[12px] mb-[70px]">
         <div className="p-4 shadow-lg border border-gray-200 relative">
           <div className="flex justify-between">
             <h3 className="uppercase text-lg">LION IVORY / 5KG</h3>

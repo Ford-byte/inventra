@@ -9,7 +9,7 @@ export default function TransactionTable(props) {
     ];
   
     return (
-      <div className=" bg-white dark:bg-neutral-700 w-full py-[12px]">
+      <div className=" bg-white dark:bg-neutral-700 w-full py-[12px] mb-[100px]">
         <div className="relative m-[2px] py-2">
           <label htmlFor="inputSearch" className="sr-only">
             Search
