@@ -33,14 +33,28 @@ const useProductApiStore = create(
         }
       },
 
-      getProduct: async () => {
+      getProduct: async ({ search }) => {
         try {
-          const response = await apiClient.get(`/api/product`);
+          const response = await apiClient.post(`/api/product`, { search });
           return response;
         } catch (error) {
           const errorMessage =
             error?.response?.data?.message || "Error occured.";
           console.log(errorMessage);
+        }
+      },
+
+      deleteProduct: async ({ id }) => {
+        try {
+          const response = await apiClient.delete("/api/product", {
+            data: { id },
+          });
+          toast.success(response?.data?.message);
+          return response;
+        } catch (error) {
+          const errorMessage =
+            error?.response?.data?.message || "Error occurred.";
+          toast.error(errorMessage);
         }
       },
     }),

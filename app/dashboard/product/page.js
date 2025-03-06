@@ -4,28 +4,40 @@ import DeleteIcon from "@/public/icons/delete";
 import useProductApiStore from "@/public/components/store/useProductApi";
 import EditIcon from "@/public/icons/edit";
 import { useEffect, useState } from "react";
+import ConfirmDelete from "@/public/components/popup/confirmationDelete";
 
 export default function Page() {
-  const { getProduct } = useProductApiStore();
+  const { getProduct, deleteProduct } = useProductApiStore();
   const [products, setProducts] = useState();
+  const [isDelete, setDeleteOpen] = useState(false);
+  const [id, setId] = useState();
   useEffect(() => {
-    const fetchProduct = async () => {
-      try {
-        const response = await getProduct();
-        setProducts(response?.data?.data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
     fetchProduct();
   }, []);
 
-  function removeTimestamp(inputString) {
-
+  const removeTimestamp = (inputString) => {
     const splitString = inputString.split("T")[0];
     return splitString;
-  }
+  };
+
+  const fetchProduct = async (search) => {
+    try {
+      const response = await getProduct({ search: search });
+      setProducts(response?.data?.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      const response = await deleteProduct({ id: id });
+      console.log(response);
+      fetchProduct();
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <div className="container px-[8px]">
@@ -35,6 +47,7 @@ export default function Page() {
           type="search"
           className="border border-gray-500 p-[4px]"
           placeholder="Search..."
+          onChange={(e) => fetchProduct(e.target.value)}
         />
       </div>
       {/*  */}
@@ -53,7 +66,12 @@ export default function Page() {
                       <EditIcon className={`size-4 fill-blue-500`} />
                     </span>
                     <span className="">
-                      <DeleteIcon className={`size-4 fill-red-500`} />
+                      <DeleteIcon
+                        className={`size-4 fill-red-500`}
+                        onClick={() => {
+                          setId(item?.product_id);
+                        }}
+                      />
                     </span>
                   </div>
                 </div>
@@ -73,12 +91,24 @@ export default function Page() {
                 </div>
                 <div className="pt-[12px] text-xs flex justify-end">
                   Last Updated:{" "}
-                  <span className="px-[4px]">{removeTimestamp(item?.date)}</span>
+                  <span className="px-[4px]">
+                    {removeTimestamp(item?.date)}
+                  </span>
                 </div>
               </div>
             );
           })}
       </div>
+      {id && (
+        <ConfirmDelete
+          onConfirm={() => {
+            handleDelete(id);
+          }}
+          onCancel={() => {
+            setId("");
+          }}
+        />
+      )}
     </div>
   );
 }

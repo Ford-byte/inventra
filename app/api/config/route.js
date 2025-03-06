@@ -11,28 +11,33 @@ const pool = mysql.createPool({
 });
 
 export async function GET() {
-  return new Promise((resolve) => {
-    pool.getConnection((err, connection) => {
-      if (err) {
-        resolve(
-          NextResponse.json(
-            {
-              message: "Database connection failed!",
-              error: err.message,
-            },
-            { status: 500 }
-          )
-        );
-      } else {
-        connection.release(); 
-        resolve(
-          NextResponse.json({
-            message: "Connected to the database successfully!",
-          })
-        );
-      }
+  try {
+    const connection = await new Promise((resolve, reject) => {
+      pool.getConnection((err, conn) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(conn);
+        }
+      });
     });
-  });
+
+    connection.release();
+
+    return NextResponse.json({
+      message: "Connected to the database successfully!",
+    });
+  } catch (err) {
+    console.error("Database connection error:", err.message);
+
+    return NextResponse.json(
+      {
+        message: "Database connection failed!",
+        error: err.message,
+      },
+      { status: 500 }
+    );
+  }
 }
 
 export default pool;
