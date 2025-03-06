@@ -8,31 +8,35 @@ const pool = mysql.createPool({
   database: process.env.DB_NAME,
   connectionLimit: 10,
   queueLimit: 0,
+  acquireTimeout: 10000,
 });
 
 export async function GET() {
-  return new Promise((resolve) => {
-    pool.getConnection((err, connection) => {
-      if (err) {
-        resolve(
-          NextResponse.json(
-            {
-              message: "Database connection failed!",
-              error: err.message,
-            },
-            { status: 500 }
-          )
-        );
-      } else {
-        connection.release(); 
-        resolve(
-          NextResponse.json({
-            message: "Connected to the database successfully!",
-          })
-        );
-      }
+  try {
+    const connection = await new Promise((resolve, reject) => {
+      pool.getConnection((err, connection) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(connection);
+        }
+      });
     });
-  });
+
+    connection.release();
+    return NextResponse.json({
+      message: "Connected to the database successfully!",
+    });
+  } catch (err) {
+    console.error("Database connection failed:", err);
+    return NextResponse.json(
+      {
+        message: "Database connection failed!",
+        error: err.message,
+      },
+      { status: 500 }
+    );
+  }
 }
 
 export default pool;
