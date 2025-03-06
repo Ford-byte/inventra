@@ -29,6 +29,8 @@ export async function POST(req) {
       hashedPassword,
     ]);
 
+    console.log(response?.status);
+
     if (response) {
       const queryTwo = `INSERT INTO user_details(id,user_id,fullname,email,phone_number) VALUES(?,?,?,?,?)`;
 
