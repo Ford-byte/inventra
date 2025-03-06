@@ -13,7 +13,13 @@ export async function POST(req) {
       );
     }
 
-    const query = "SELECT password FROM user WHERE username = ? AND flag = 1";
+    const query = `SELECT u.password, ud.fullname, ud.email, ud.phone_number 
+FROM user AS u 
+LEFT JOIN user_details AS ud 
+    ON u.id = ud.user_id 
+WHERE username = ?
+    AND flag = 1;
+`;
 
     const results = await new Promise((resolve, reject) => {
       pool.query(query, [username], (error, results) => {
@@ -34,7 +40,7 @@ export async function POST(req) {
 
     if (isMatch) {
       return NextResponse.json(
-        { message: "Login successful" },
+        { message: "Login successful", data: results[0] },
         { status: 200 }
       );
     } else {

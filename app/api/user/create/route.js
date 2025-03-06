@@ -15,6 +15,23 @@ export async function POST(req) {
       );
     }
 
+    const userMatch = await new Promise((resolve, reject) => {
+      pool.query("SELECT 1 FROM user WHERE username = ?", [username], (err, result) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(result);
+        }
+      });
+    });
+
+    if (userMatch && userMatch.length > 0) {
+      return NextResponse.json(
+        { message: "Username already taken!" },
+        { status: 409 }
+      );
+    }
+
     const userId = uuid();
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -29,10 +46,8 @@ export async function POST(req) {
       hashedPassword,
     ]);
 
-    console.log(response?.status);
-
     if (response) {
-      const queryTwo = `INSERT INTO user_details(id,user_id,fullname,email,phone_number) VALUES(?,?,?,?,?)`;
+      const queryTwo = `INSERT INTO user_details(id, user_id, fullname, email, phone_number) VALUES(?,?,?,?,?)`;
 
       await pool.query(queryTwo, [
         uuid(),

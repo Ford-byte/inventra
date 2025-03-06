@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import mysql from "mysql2";
+import mysql from "mysql";
 
 const pool = mysql.createPool({
   host: process.env.DB_HOST,
@@ -8,29 +8,31 @@ const pool = mysql.createPool({
   database: process.env.DB_NAME,
   connectionLimit: 10,
   queueLimit: 0,
-  acquireTimeout: 10000,
 });
 
-const promisePool = pool.promise();
-
 export async function GET() {
-  try {
-    const [rows] = await promisePool.query("SELECT 1");
-
-    return NextResponse.json({
-      message: "Connected to the database successfully!",
-      rows,
+  return new Promise((resolve) => {
+    pool.getConnection((err, connection) => {
+      if (err) {
+        resolve(
+          NextResponse.json(
+            {
+              message: "Database connection failed!",
+              error: err.message,
+            },
+            { status: 500 }
+          )
+        );
+      } else {
+        connection.release(); 
+        resolve(
+          NextResponse.json({
+            message: "Connected to the database successfully!",
+          })
+        );
+      }
     });
-  } catch (err) {
-    console.error("Database connection failed:", err);
-    return NextResponse.json(
-      {
-        message: "Database connection failed!",
-        error: err.message,
-      },
-      { status: 500 }
-    );
-  }
+  });
 }
 
-export default promisePool;
+export default pool;

@@ -38,7 +38,6 @@ const useUserApiStore = create(
             email,
             phoneNumber,
           });
-          console.log(response);
           toast.success(response?.data?.message);
           return response;
         } catch (error) {

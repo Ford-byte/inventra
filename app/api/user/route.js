@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import pool from "../config/route";
+
 export async function GET() {
   return new Promise((resolve, reject) => {
     const query = `SELECT * FROM user`;
