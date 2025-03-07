@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Mar 06, 2025 at 10:23 AM
+-- Generation Time: Mar 07, 2025 at 09:15 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -58,7 +58,7 @@ CREATE TABLE `product` (
   `product_name` varchar(255) NOT NULL,
   `price` float NOT NULL,
   `stock_in` int(255) DEFAULT NULL,
-  `stock_out` int(255) DEFAULT NULL,
+  `stock_out` int(255) DEFAULT 0,
   `date` date NOT NULL DEFAULT current_timestamp(),
   `flag` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -68,8 +68,9 @@ CREATE TABLE `product` (
 --
 
 INSERT INTO `product` (`id`, `product_name`, `price`, `stock_in`, `stock_out`, `date`, `flag`) VALUES
-('a22e929b-9347-404f-821a-45990c91d423', 'eee', 134, 23, NULL, '2025-03-06', 1),
-('faf6c897-4dfa-4104-aed8-1f4d66e148ca', 'qwe', 12, 12, 4, '2025-03-06', 1);
+('a22e929b-9347-404f-821a-45990c91d423', 'eee', 134, 0, 0, '2025-03-06', 1),
+('f9cec70f-9bcb-467d-88ec-71cb80c624f8', 'eee', 250, 25, 0, '2025-03-07', 1),
+('faf6c897-4dfa-4104-aed8-1f4d66e148ca', 'qweeeee', 12, 12, 4, '2025-03-06', 1);
 
 -- --------------------------------------------------------
 
@@ -90,6 +91,7 @@ CREATE TABLE `product_details` (
 
 INSERT INTO `product_details` (`id`, `product_id`, `supplier_id`, `category_id`) VALUES
 ('116d500c-f8bd-42ba-94ff-32c73de93641', 'faf6c897-4dfa-4104-aed8-1f4d66e148ca', '123', '7'),
+('381dd105-844e-476f-b8e1-c28f3362c026', 'f9cec70f-9bcb-467d-88ec-71cb80c624f8', 'qwe', '4'),
 ('745c7def-b416-4512-9baf-edd34ef81a7b', 'a22e929b-9347-404f-821a-45990c91d423', '123', '4');
 
 -- --------------------------------------------------------
@@ -104,6 +106,20 @@ CREATE TABLE `supplier` (
   `item_supplied` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
   `phone_number` text NOT NULL,
+  `flag` tinyint(1) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `transaction`
+--
+
+CREATE TABLE `transaction` (
+  `id` varchar(255) NOT NULL,
+  `product_name` varchar(255) NOT NULL,
+  `price` float NOT NULL,
+  `stock_out` int(255) NOT NULL,
   `flag` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -150,6 +166,19 @@ INSERT INTO `user_details` (`id`, `user_id`, `fullname`, `email`, `phone_number`
 ('bb74ea5a-63c0-455c-8d65-15387a7c26f6', 'd1a563ae-b3c3-4eab-a98d-57c27577e468', 'Clifford', 'cliffordjay.halcyondigital@gmail.com', '0912345678'),
 ('c1bc48b7-08b9-4df7-b975-28c12abd5c68', 'ae6d3012-6892-49f7-98ad-443f4e745612', 'Clifford', 'cliffordjay.halcyondigital@gmail.com', '0912345678');
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user_transaction`
+--
+
+CREATE TABLE `user_transaction` (
+  `id` varchar(255) NOT NULL,
+  `user_id` varchar(255) NOT NULL,
+  `transaction_id` varchar(255) NOT NULL,
+  `flag` tinyint(1) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 --
 -- Indexes for dumped tables
 --
@@ -179,6 +208,12 @@ ALTER TABLE `supplier`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `transaction`
+--
+ALTER TABLE `transaction`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `user`
 --
 ALTER TABLE `user`
@@ -188,6 +223,12 @@ ALTER TABLE `user`
 -- Indexes for table `user_details`
 --
 ALTER TABLE `user_details`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `user_transaction`
+--
+ALTER TABLE `user_transaction`
   ADD PRIMARY KEY (`id`);
 
 --
