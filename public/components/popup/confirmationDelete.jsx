@@ -1,8 +1,8 @@
 export default function ConfirmDelete(props) {
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50">
+    <div className="fixed inset-0 flex items-center justify-center z-50 ">
       <div className="fixed inset-0 bg-gray-800 bg-opacity-50 z-[50]" onClick={props.onCancel}></div>
-      <div className="bg-white p-8 rounded-lg w-96 z-[51]">
+      <div className="bg-white p-8 rounded-lg w-96 z-[51] slide-in-blurred-top">
         <h2 className="font-semibold mb-4 text-sm">
           Are you sure you want to delete this?
         </h2>

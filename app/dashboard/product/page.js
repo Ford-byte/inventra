@@ -5,12 +5,15 @@ import useProductApiStore from "@/public/components/store/useProductApi";
 import EditIcon from "@/public/icons/edit";
 import { useEffect, useState } from "react";
 import ConfirmDelete from "@/public/components/popup/confirmationDelete";
+import { useRouter } from "next/navigation";
 
 export default function Page() {
-  const { getProduct, deleteProduct } = useProductApiStore();
+  const { getProduct, deleteProduct, setProduct } = useProductApiStore();
   const [products, setProducts] = useState();
-  const [isDelete, setDeleteOpen] = useState(false);
   const [id, setId] = useState();
+  const router = useRouter();
+  const productCache = {};
+
   useEffect(() => {
     fetchProduct();
   }, []);
@@ -20,10 +23,21 @@ export default function Page() {
     return splitString;
   };
 
-  const fetchProduct = async (search) => {
+  const fetchProduct = async (search = "") => {
+    if (search && productCache[search]) {
+      setProducts(productCache[search]);
+      return;
+    }
+
     try {
       const response = await getProduct({ search: search });
-      setProducts(response?.data?.data);
+      const data = response?.data?.data;
+
+      if (search) {
+        productCache[search] = data;
+      }
+
+      setProducts(data);
     } catch (error) {
       console.log(error);
     }
@@ -54,16 +68,29 @@ export default function Page() {
       <div className="flex flex-col gap-y-[6px] py-[12px] mb-[70px]">
         {products &&
           products?.map((item, index) => {
+            console.log(item);
             return (
               <div
-                className="p-4 shadow-lg border border-gray-200 relative"
+                className={`p-4 shadow-lg border relative ${
+                  item?.stock_difference < 10 && item?.stock_difference > 0
+                    ? "border-yellow-500"
+                    : item?.stock_difference < 1
+                    ? "border-red-500"
+                    : "border-gray-200"
+                }`}
                 key={index}
               >
                 <div className="flex justify-between">
                   <h3 className="uppercase text-lg">{item?.product_name}</h3>
                   <div className="flex gap-[4px]">
                     <span className="">
-                      <EditIcon className={`size-4 fill-blue-500`} />
+                      <EditIcon
+                        className={`size-4 fill-blue-500`}
+                        onClick={() => {
+                          setProduct([item]);
+                          router.push(`/dashboard/product/add`);
+                        }}
+                      />
                     </span>
                     <span className="">
                       <DeleteIcon

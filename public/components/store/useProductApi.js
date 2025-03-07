@@ -6,6 +6,9 @@ import { persist } from "zustand/middleware";
 const useProductApiStore = create(
   persist(
     (set, get) => ({
+      product: [],
+      setProduct: (newProduct) => set({ product: newProduct }),
+
       getCategories: async () => {
         try {
           const response = apiClient.get(`/api/product/category`);
@@ -48,6 +51,30 @@ const useProductApiStore = create(
         try {
           const response = await apiClient.delete("/api/product", {
             data: { id },
+          });
+          toast.success(response?.data?.message);
+          return response;
+        } catch (error) {
+          const errorMessage =
+            error?.response?.data?.message || "Error occurred.";
+          toast.error(errorMessage);
+        }
+      },
+
+      editProduct: async ({
+        price,
+        stock_in,
+        category_id,
+        product_name,
+        id,
+      }) => {
+        try {
+          const response = await apiClient.put("/api/product", {
+            price,
+            stock_in,
+            category_id,
+            product_name,
+            id,
           });
           toast.success(response?.data?.message);
           return response;

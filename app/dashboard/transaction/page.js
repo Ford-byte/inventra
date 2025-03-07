@@ -1,11 +1,17 @@
 import TransactionTable from "@/public/components/tables/transactionTable";
+import Link from "next/link";
 
 export default function Page() {
   return (
     <div className="">
-      <h2 className="text-center font-black py-[12px] text-xl p-4">TRANSACTION</h2>
+      <h2 className="text-center font-black py-[12px] text-xl p-4">
+        TRANSACTION
+      </h2>
       <div className="flex justify-end py-[4px]">
-        <div className="text-xs bg-[#4536CA] text-white p-[8px] flex items-center gap-x-[4px]">
+        <Link
+          href={`/dashboard/product/add`}
+          className="text-xs bg-[#4536CA] text-white p-[8px] flex items-center gap-x-[4px]"
+        >
           <svg viewBox="0 0 24 24" fill="currentColor" className="size-4">
             <path
               fillRule="evenodd"
@@ -14,7 +20,7 @@ export default function Page() {
             />
           </svg>
           ADD TRANSACTION
-        </div>
+        </Link>
       </div>
       <TransactionTable />
     </div>
