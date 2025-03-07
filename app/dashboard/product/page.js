@@ -68,7 +68,6 @@ export default function Page() {
       <div className="flex flex-col gap-y-[6px] py-[12px] mb-[70px]">
         {products &&
           products?.map((item, index) => {
-            console.log(item);
             return (
               <div
                 className={`p-4 shadow-lg border relative ${
