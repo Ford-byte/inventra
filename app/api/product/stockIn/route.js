@@ -6,7 +6,6 @@ export async function POST(req) {
   try {
     const { name, price, stock, category, supplier } = await req.json();
 
-    // Validate inputs
     if (!name || !price || !stock || !category || !supplier) {
       return NextResponse.json(
         { message: "Missing required fields" },

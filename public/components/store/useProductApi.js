@@ -47,6 +47,17 @@ const useProductApiStore = create(
         }
       },
 
+      getProductNames: async () => {
+        try {
+          const response = await apiClient.get(`/api/product`);
+          return response;
+        } catch (error) {
+          const errorMessage =
+            error?.response?.data?.message || "Error occured.";
+          console.log(errorMessage);
+        }
+      },
+
       deleteProduct: async ({ id }) => {
         try {
           const response = await apiClient.delete("/api/product", {

@@ -206,17 +206,17 @@ export default function Page() {
               onChange={handleChange}
             />
           </div>
-          <div className="flex justify-end gap-[8px] py-[12px]">
+          <div className="flex justify-end gap-4 py-[4px]">
             {mode === "add" ? (
               <button
-                className="text-sm py-[4px] bg-red-500 text-white px-[8px] font-black cursor-pointer"
+                className="text-sm py-3 bg-red-500 text-white px-4 font-black cursor-pointer"
                 onClick={handleCancel}
               >
                 Cancel
               </button>
             ) : (
               <button
-                className="text-sm py-[4px] bg-red-500 text-white px-[8px] font-black cursor-pointer"
+                className="text-sm py-3 bg-red-500 text-white px-4 font-black cursor-pointer"
                 onClick={handleBack}
               >
                 Back
@@ -225,14 +225,14 @@ export default function Page() {
 
             {mode === "add" ? (
               <button
-                className="text-sm py-[4px] bg-blue-500 text-white px-[8px] font-black cursor-pointer"
+                className="text-sm py-3 bg-blue-500 text-white px-4 font-black cursor-pointer"
                 onClick={handleSaveProduct}
               >
                 Save
               </button>
             ) : (
               <button
-                className="text-sm py-[4px] bg-blue-500 text-white px-[8px] font-black cursor-pointer"
+                className="text-sm py-3 bg-blue-500 text-white px-4 font-black cursor-pointer"
                 onClick={handleUpdate}
               >
                 Update
