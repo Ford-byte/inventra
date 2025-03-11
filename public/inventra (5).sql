@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Mar 07, 2025 at 09:15 AM
+-- Generation Time: Mar 11, 2025 at 08:46 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -70,7 +70,7 @@ CREATE TABLE `product` (
 INSERT INTO `product` (`id`, `product_name`, `price`, `stock_in`, `stock_out`, `date`, `flag`) VALUES
 ('a22e929b-9347-404f-821a-45990c91d423', 'eee', 134, 0, 0, '2025-03-06', 1),
 ('f9cec70f-9bcb-467d-88ec-71cb80c624f8', 'eee', 250, 25, 0, '2025-03-07', 1),
-('faf6c897-4dfa-4104-aed8-1f4d66e148ca', 'qweeeee', 12, 12, 4, '2025-03-06', 1);
+('faf6c897-4dfa-4104-aed8-1f4d66e148ca', 'qweeeee', 12, 9, 4, '2025-03-06', 1);
 
 -- --------------------------------------------------------
 
@@ -109,6 +109,14 @@ CREATE TABLE `supplier` (
   `flag` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `supplier`
+--
+
+INSERT INTO `supplier` (`id`, `fullname`, `item_supplied`, `email`, `phone_number`, `flag`) VALUES
+('14f61da8-f105-4be7-820c-48cdee9bbf2e', 'Clifford Jay Iyac', 'Rice', 'cliffordjay.halcyondigital@gmail.com', '0912345678', 0),
+('84236cb8-f061-41ad-b7af-c2a9f88f0c11', 'Clifford Jay Iyac', 'Rice', 'cliffordjay.halcyondigital@gmail.com', '09123456789', 1);
+
 -- --------------------------------------------------------
 
 --
@@ -122,6 +130,13 @@ CREATE TABLE `transaction` (
   `stock_out` int(255) NOT NULL,
   `flag` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `transaction`
+--
+
+INSERT INTO `transaction` (`id`, `product_name`, `price`, `stock_out`, `flag`) VALUES
+('bebe1a15-dba7-4a1e-8356-8314b7258f1d', 'qweeeee', 12, 23, 1);
 
 -- --------------------------------------------------------
 
@@ -178,6 +193,13 @@ CREATE TABLE `user_transaction` (
   `transaction_id` varchar(255) NOT NULL,
   `flag` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `user_transaction`
+--
+
+INSERT INTO `user_transaction` (`id`, `user_id`, `transaction_id`, `flag`) VALUES
+('1', 'ae6d3012-6892-49f7-98ad-443f4e745612', 'db006dbd-233d-48ec-ad60-81fcd7b30c5b', 1);
 
 --
 -- Indexes for dumped tables
