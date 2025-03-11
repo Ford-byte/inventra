@@ -1,44 +1,35 @@
 import { NextResponse } from "next/server";
 import pool from "../config/route";
+import { v4 as uuidv4 } from "uuid";
 
-export async function GET(req) {
+export async function GET() {
   try {
-    const offset = parseInt(req.nextUrl.searchParams.get("offset") || '0', 10);
-    const limit = parseInt(req.nextUrl.searchParams.get("limit") || '5', 10);
+    const query = `SELECT * from user_transaction as ut LEFT JOIN transaction as t ON t.id = ut.transaction_id WHERE 1`;
 
-    const query = `WITH RowNumCTE AS (
-        SELECT 
-          ut.id AS ut_id,       
-          t.id AS t_id,          
-          ut.transaction_id,
-          ROW_NUMBER() OVER (ORDER BY ut.id) AS row_num
-        FROM 
-          user_transaction AS ut
-        LEFT JOIN 
-          transaction AS t 
-        ON 
-          t.id = ut.transaction_id
-      )
-      SELECT * 
-      FROM RowNumCTE
-      WHERE row_num BETWEEN ? AND ?`;
-
-    const results = pool.query(query, [offset,limit]);
+    const results = await new Promise((resolve, reject) => {
+      pool.query(query, (error, results) => {
+        if (error) reject(error);
+        else resolve(results);
+      });
+    });
 
     return NextResponse.json(
-      { message: "Success!", data: results.rows },
+      {
+        message: "Fetch Successfully!",
+        data: results,
+      },
       { status: 200 }
     );
-
   } catch (error) {
-    console.log("Database query error:", error);
     return NextResponse.json(
-      { message: "Internal server error!", error: error.message },
+      {
+        message: "Internal server error.",
+        error: error.message,
+      },
       { status: 500 }
     );
   }
 }
-
 
 export async function POST(req) {
   try {
@@ -62,7 +53,7 @@ export async function POST(req) {
 
     return NextResponse.json(
       {
-        message: "Successfully posted",
+        message: "Successfully Recorded",
       },
       { status: 200 }
     );

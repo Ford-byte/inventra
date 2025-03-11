@@ -1,5 +1,6 @@
 "use client";
 
+import SupplierForm from "@/public/components/forms/supplierForm";
 import TransactionForm from "@/public/components/forms/transactionForm";
 import useProductApiStore from "@/public/components/store/useProductApi";
 import { useRouter } from "next/navigation";
@@ -78,8 +79,7 @@ export default function Page() {
         supplier: supplier,
       };
 
-      const response = await addProduct(productData); // addProduct should create a new product
-      console.log(response);
+      const response = await addProduct(productData);
     } catch (error) {
       console.error("Error saving product:", error);
     }
@@ -101,7 +101,6 @@ export default function Page() {
         category_id: category,
         id: productId,
       });
-      console.log(response);
     } catch (error) {
       console.error("Error updating product:", error);
     }
@@ -142,12 +141,12 @@ export default function Page() {
 
   return (
     <div>
-      {mode !== "transaction" && (
+      {mode !== "transaction" && mode !== "supplier" && (
         <h2 className="text-center font-black py-[12px] text-xl uppercase">
-          {mode === "update" ? "Update Product" : "Add Product"}
+          {mode === "update" ? "Update Product" :  "Add Product"}
         </h2>
       )}
-      {mode !== "transaction" && (
+      {mode !== "transaction" && mode !== "supplier" && (
         <div className="border-y border-gray-500 w-full flex flex-col gap-y-[12px] p-4">
           <div>
             <input
@@ -241,7 +240,7 @@ export default function Page() {
           </div>
         </div>
       )}
-      {mode !== "update" && (
+      {mode !== "update" && mode !== "supplier" && (
         <div
           className={`${
             mode === "transaction"
@@ -253,7 +252,25 @@ export default function Page() {
           ADD TRANSACTION
         </div>
       )}
-      {mode === "transaction" && <TransactionForm onCancel={closeTransaction}/>}
+      {mode === "transaction" && (
+        <TransactionForm onCancel={closeTransaction} />
+      )}
+
+      {mode !== "update" && mode !== "transaction" && (
+        <div
+          className={`${
+            mode === "supplier"
+              ? "text-center font-black py-[12px] text-xl uppercase"
+              : "text-center font-black py-[12px] text-md uppercase shadow-lg bg-blue-500 text-white my-[12px]"
+          }`}
+          onClick={() => setMode("supplier")}
+        >
+          ADD SUPPLIER
+        </div>
+      )}
+      {mode === "supplier" && (
+        <SupplierForm onCancel={closeTransaction} />
+      )}
     </div>
   );
 }

@@ -46,7 +46,6 @@ export default function Page() {
   const handleDelete = async (id) => {
     try {
       const response = await deleteProduct({ id: id });
-      console.log(response);
       fetchProduct();
     } catch (error) {
       console.log(error);
@@ -59,7 +58,7 @@ export default function Page() {
       <div className="flex justify-center">
         <input
           type="search"
-          className="border border-gray-500 p-[4px]"
+          className=" w-full my-4 rounded-lg border dark:border-none dark:bg-neutral-600 py-2 pl-2 pr-1 text-sm focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
           placeholder="Search..."
           onChange={(e) => fetchProduct(e.target.value)}
         />

@@ -2,16 +2,18 @@
 
 import { useEffect, useState } from "react";
 import useProductApiStore from "../store/useProductApi";
+import useTransactionApi from "../store/useTransactionApi";
 
 export default function TransactionForm(props) {
   const { getProductNames } = useProductApiStore();
+  const { addTransaction } = useTransactionApi();
   const [products, setProducts] = useState([]);
-  const [selectedProduct, setSelectedProduct] = useState(""); // Changed to selectedProduct
+  const [selectedProduct, setSelectedProduct] = useState("");
   const [price, setPrice] = useState("");
   const [stock, setStock] = useState(0);
   const [loading, setLoading] = useState(false);
   const [productPrice, setProductPrice] = useState(0);
-  const [piece, setPieces] = useState(0);
+  const [pieces, setPieces] = useState(0);
 
   useEffect(() => {
     fetchProducts();
@@ -30,15 +32,37 @@ export default function TransactionForm(props) {
   };
 
   const handleProductChange = (e) => {
-    setSelectedProduct(e.target.value);
+    const selectedProductId = e.target.value;
+    setSelectedProduct(selectedProductId);
+    const selectedProduct = products.find(
+      (item) => item.id === selectedProductId
+    );
+    if (selectedProduct) {
+      setProductPrice(selectedProduct.price);
+      setStock(selectedProduct.stock_in);
+    }
   };
 
-  const handleSave = () => {
-    if (!selectedProduct || !price || !stock) {
-      alert("Please fill in all the fields.");
-      return;
+  const handleSave = async () => {
+    try {
+      const selectedProductName = products.find(
+        (product) => product.id === selectedProduct
+      )?.product_name;
+
+      if (!selectedProductName) {
+        console.error("Product not found");
+        return;
+      }
+
+      const response = await addTransaction({
+        product_name: selectedProductName,
+        price: productPrice,
+        stock: pieces,
+      });
+      console.log(response);
+    } catch (error) {
+      console.log(error);
     }
-    console.log({ selectedProduct, price, stock });
   };
 
   return (
@@ -53,19 +77,8 @@ export default function TransactionForm(props) {
                 <div className="flex flex-col gap-y-4">
                   <select
                     className="w-full px-3 py-3 border border-gray-300 text-sm"
-                    onChange={(e) => {
-                      const selectedProductId = e.target.value;
-                      const selectedProduct = products.find(
-                        (item) => item.id === selectedProductId
-                      );
-                      if (selectedProduct) {
-                        setProductPrice(selectedProduct.price);
-                      }
-
-                      if (selectedProduct) {
-                        setStock(selectedProduct.stock_in);
-                      }
-                    }}
+                    onChange={handleProductChange}
+                    value={selectedProduct}
                   >
                     {products.map((item) => (
                       <option key={item.id} value={item.id}>
@@ -79,6 +92,7 @@ export default function TransactionForm(props) {
                       className="w-full px-3 py-3 border border-gray-300 text-sm"
                       placeholder="Price"
                       name="price"
+                      disabled={true}
                       value={productPrice}
                       onChange={(e) => setPrice(e.target.value)}
                     />
@@ -87,7 +101,7 @@ export default function TransactionForm(props) {
                   <div>
                     <input
                       type="number"
-                      className={`w-full px-3 py-3 border  text-sm ${
+                      className={`w-full px-3 py-3 border text-sm ${
                         stock < 1
                           ? "border-red-500"
                           : stock < 10
@@ -96,7 +110,8 @@ export default function TransactionForm(props) {
                       }`}
                       placeholder="Stock"
                       name="stock"
-                      value={piece}
+                      value={pieces}
+                      disabled={stock === 0 ? true : false}
                       onChange={(e) => setPieces(e.target.value)}
                     />
                   </div>

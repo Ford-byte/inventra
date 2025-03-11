@@ -3,39 +3,37 @@ import { toast } from "react-toastify";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-const useTransactionApi = create(
+const useSupplierApi = create(
   persist(
     (set, get) => ({
-      product: [],
-      setProduct: (newProduct) => set({ product: newProduct }),
-
-      getTransactions: async () => {
+      getSupplier: async () => {
         try {
-          const response = await apiClient.get(`/api/transaction`);
+          const response = await apiClient.get(`/api/supplier`);
           return response;
         } catch (error) {
           console.log(error.error);
         }
       },
 
-      transactionPagination: async ({ offset, limit }) => {
+      addSupplier: async ({ fullname, item_supplied, email, phone_number }) => {
         try {
-          const response = await apiClient.post(`/api/transaction/paginate`, {
-            offset: offset,
-            limit: limit,
+          const response = await apiClient.post(`/api/supplier`, {
+            fullname,
+            item_supplied,
+            email,
+            phone_number,
           });
+          toast.success(response?.data?.message);
           return response;
         } catch (error) {
           console.log(error.error);
         }
       },
 
-      addTransaction: async ({ product_name, price, stock }) => {
+      deleteSupplier: async ({ id }) => {
         try {
-          const response = await apiClient.post(`/api/transaction`, {
-            product_name,
-            price,
-            stock,
+          const response = await apiClient.delete(`/api/supplier`, {
+            data: { id: id },
           });
           toast.success(response?.data?.message);
           return response;
@@ -50,4 +48,4 @@ const useTransactionApi = create(
   )
 );
 
-export default useTransactionApi;
+export default useSupplierApi;
