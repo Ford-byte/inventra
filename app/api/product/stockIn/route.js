@@ -1,9 +1,14 @@
 import { NextResponse } from "next/server";
 import { v4 as uuidv4 } from "uuid";
 import pool from "../../config/route";
+import NodeCache from "node-cache";
+
+const cache = new NodeCache({ stdTTL: 3600 });
 
 export async function POST(req) {
   try {
+    cache.del(`products`);
+    
     const { name, price, stock, category, supplier } = await req.json();
 
     if (!name || !price || !stock || !category || !supplier) {
@@ -23,7 +28,7 @@ export async function POST(req) {
       );
     }
 
-    const productId = uuidv4(); 
+    const productId = uuidv4();
 
     const query = `
       INSERT INTO product(id, product_name, price, stock_in, flag)
@@ -36,7 +41,7 @@ export async function POST(req) {
       VALUES (?, ?, ?, ?)
     `;
     const responseTwo = await pool.query(queryTwo, [
-      uuidv4(), 
+      uuidv4(),
       productId,
       supplier,
       category,

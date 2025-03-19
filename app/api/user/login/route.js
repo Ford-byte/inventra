@@ -1,9 +1,20 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 import pool from "../../config/route";
+import NodeCache from "node-cache";
 
+const cache = new NodeCache({ stdTTL: 3600 });
 export async function POST(req) {
   try {
+    const cacheData = cache.set(`userData`);
+
+    if (cacheData) {
+      return NextResponse.json(
+        { message: "Success from cache" },
+        { status: 400 }
+      );
+    }
+
     const { username, password } = await req.json();
 
     if (!username || !password) {
@@ -39,6 +50,8 @@ WHERE username = ?
     const isMatch = await bcrypt.compare(password, dbPassword);
 
     if (isMatch) {
+      cache.set(`userData`, results[0]);
+
       return NextResponse.json(
         { message: "Login successful", data: results[0] },
         { status: 200 }

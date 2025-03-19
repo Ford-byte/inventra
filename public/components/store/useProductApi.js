@@ -88,6 +88,7 @@ const useProductApiStore = create(
             id,
           });
           toast.success(response?.data?.message);
+          revalidate();  
           return response;
         } catch (error) {
           const errorMessage =
@@ -95,6 +96,7 @@ const useProductApiStore = create(
           toast.error(errorMessage);
         }
       },
+
     }),
     {
       name: "local-storage-state",

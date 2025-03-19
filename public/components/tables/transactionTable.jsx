@@ -40,13 +40,13 @@ export default function TransactionTable(props) {
     }
   };
 
-  const totalPages = Math.ceil(productLength / limit);
 
   return (
     <div className="bg-white dark:bg-neutral-700 w-full py-[12px] mb-[100px]">
-      
       <div className="relative m-[2px] py-2">
-        <label htmlFor="inputSearch" className="sr-only">Search</label>
+        <label htmlFor="inputSearch" className="sr-only">
+          Search
+        </label>
         <input
           id="inputSearch"
           type="text"
@@ -58,10 +58,18 @@ export default function TransactionTable(props) {
       <table className="min-w-full text-left text-xs whitespace-nowrap">
         <thead className="uppercase tracking-wider border-b-2 dark:border-neutral-600 bg-neutral-50 dark:bg-neutral-800">
           <tr>
-            <th scope="col" className="px-2 py-6">Product</th>
-            <th scope="col" className="px-2 py-6">Price</th>
-            <th scope="col" className="px-2 py-6">Stock</th>
-            <th scope="col" className="px-2 py-6">Status</th>
+            <th scope="col" className="px-2 py-6">
+              Product
+            </th>
+            <th scope="col" className="px-2 py-6">
+              Price
+            </th>
+            <th scope="col" className="px-2 py-6">
+              Stock
+            </th>
+            <th scope="col" className="px-2 py-6">
+              Status
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -72,7 +80,9 @@ export default function TransactionTable(props) {
                 index % 2 === 0 ? "bg-neutral-50 dark:bg-neutral-800" : ""
               }`}
             >
-              <th scope="row" className="px-2 py-6">{product.product_name}</th>
+              <th scope="row" className="px-2 py-6">
+                {product.product_name}
+              </th>
               <td className="px-2 py-6">{product.price}</td>
               <td className="px-2 py-6">{product.stock_out}</td>
               <td className="px-2 py-6">
@@ -87,9 +97,11 @@ export default function TransactionTable(props) {
         </tbody>
       </table>
 
-      <nav className="mt-5 flex items-center justify-between text-sm" aria-label="Page navigation example">
+      <nav
+        className="mt-5 flex items-center justify-between text-sm"
+        aria-label="Page navigation example"
+      >
         <p>
-          Page <strong>{pageCount}</strong> of <strong>{totalPages}</strong>
         </p>
 
         <ul className="list-style-none flex">

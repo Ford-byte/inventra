@@ -1,34 +1,60 @@
 import { NextResponse } from "next/server";
 import pool from "../config/route";
+import NodeCache from "node-cache";
+
+const cache = new NodeCache({ stdTTL: 3600 });
 
 export async function GET() {
-  return new Promise((resolve, reject) => {
-    const query = `SELECT id,product_name,price, stock_in FROM product WHERE flag = 1`;
+  const cacheData = cache.get("product_stock");
 
-    pool.query(query, (error, results) => {
-      if (error) {
-        console.log("Database query error:", error);
-        resolve(
-          NextResponse.json(
-            { message: "Internal server error!", error: error.message },
-            { status: 500 }
-          )
-        );
-      } else {
-        resolve(
-          NextResponse.json(
-            { message: "Success!", data: results },
-            { status: 200 }
-          )
-        );
-      }
-    });
-  });
+  if (cacheData) {
+    return NextResponse.json(
+      {
+        message: "Success from cache",
+        data: cacheData,
+      },
+      { status: 200 }
+    );
+  }
+
+  try {
+    const query = `SELECT id, product_name, price, stock_in FROM product WHERE flag = 1`;
+
+    const results = await queryAsync(query);
+
+    // Cache the results
+    cache.set("product_stock", results);
+
+    return NextResponse.json(
+      { message: "Success!", data: results },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.log("Database query error:", error);
+    return NextResponse.json(
+      { message: "Internal server error!", error: error.message },
+      { status: 500 }
+    );
+  }
 }
 
 export async function POST(req) {
   try {
     const { search } = await req.json();
+    const cacheKey = `products_search_${search || ""}`;
+
+    // Check if we already have cache for this specific search term
+    const cacheData = cache.get(cacheKey);
+
+    if (cacheData) {
+      return NextResponse.json(
+        {
+          message: "Success from cache",
+          data: cacheData,
+        },
+        { status: 200 }
+      );
+    }
 
     const query = `
       SELECT 
@@ -40,21 +66,13 @@ export async function POST(req) {
       WHERE (c.category LIKE ? OR p.product_name LIKE ?) AND p.flag = 1 ORDER BY p.date ASC;
     `;
 
-    const queryAsync = (query, params) => {
-      return new Promise((resolve, reject) => {
-        pool.query(query, params, (err, result) => {
-          if (err) reject(err);
-          else resolve(result);
-        });
-      });
-    };
+    const result =
+      search && search.length > 0
+        ? await queryAsync(query, [`%${search}%`, `%${search}%`])
+        : await queryAsync(query, [`%`, `%`]);
 
-    let result = [];
-    if (search && search.length > 0) {
-      result = await queryAsync(query, [`%${search}%`, `%${search}%`]);
-    } else {
-      result = await queryAsync(query, [`%`, `%`]);
-    }
+    // Cache the results using the unique cacheKey
+    cache.set(cacheKey, result);
 
     return NextResponse.json({
       message: "Fetch Successful.",
@@ -79,21 +97,31 @@ export async function DELETE(req) {
     const { id } = await req.json();
 
     const query = `UPDATE product SET flag = 0 WHERE id = ?`;
-    const response = pool.query(query, [id]);
 
-    if (response) {
+    // Wait for query execution and check result
+    const result = await queryAsync(query, [id]);
+
+    if (result.affectedRows > 0) {
       return NextResponse.json(
         {
           message: "Deleted successfully",
         },
         { status: 200 }
       );
+    } else {
+      return NextResponse.json(
+        {
+          message: "Product not found",
+        },
+        { status: 404 }
+      );
     }
   } catch (error) {
+    console.error("Error deleting product:", error);
     return NextResponse.json(
       {
         message: "Internal server error",
-        error: error,
+        error: error.message,
       },
       {
         status: 500,
@@ -129,24 +157,9 @@ export async function PUT(req) {
       WHERE product_id = ?;
     `;
 
-    await new Promise((resolve, reject) => {
-      pool.query(
-        query1,
-        [product_name, price, stock_in, id],
-        (error, result) => {
-          if (error) {
-            return reject(error);
-          }
-
-          pool.query(query2, [category_id, id], (error, result) => {
-            if (error) {
-              return reject(error);
-            }
-            resolve(result);
-          });
-        }
-      );
-    });
+    // Execute queries sequentially
+    await queryAsync(query1, [product_name, price, stock_in, id]);
+    await queryAsync(query2, [category_id, id]);
 
     return NextResponse.json(
       { message: "Product updated successfully" },
@@ -163,3 +176,13 @@ export async function PUT(req) {
     );
   }
 }
+
+// Utility function to handle queries as promises
+const queryAsync = (query, params = []) => {
+  return new Promise((resolve, reject) => {
+    pool.query(query, params, (error, results) => {
+      if (error) reject(error);
+      else resolve(results);
+    });
+  });
+};
