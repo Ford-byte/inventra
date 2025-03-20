@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useState } from "react";
 import useUserApiStore from "../store/useUserApi";
 import { useRouter } from "next/navigation";
+import { z } from "zod";
 
 export default function LoginForm({ onClick, toggleRegister }) {
   const { userLogin } = useUserApiStore();
@@ -11,12 +12,61 @@ export default function LoginForm({ onClick, toggleRegister }) {
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState({ username: "", password: "" });
+
+  const formSchema = z.object({
+    username: z.string().min(1, "Username is required"),
+    password: z.string().min(6, "Password must be at least 6 characters"),
+  });
+
+  // Handle input change for username and password
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    if (name === "username") {
+      setUsername(value);
+    } else if (name === "password") {
+      setPassword(value);
+    }
+
+    setError((prevError) => ({
+      ...prevError,
+      [name]: undefined,
+    }));
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    const response = await userLogin({ username, password });
-    if (response) {
-      router.push(`/dashboard`);
+
+    // Reset the error state before starting the validation
+    setError({ username: "", password: "" });
+
+    try {
+      // Validate form inputs using Zod schema
+      formSchema.parse({ username, password });
+
+      // If validation passes, attempt login
+      const response = await userLogin({ username, password });
+
+      // Check if login is successful and navigate to the dashboard
+      if (response.status === 200) {
+        router.push(`/dashboard`);
+      } else {
+        setError({ ...error, username: "Invalid username or password" });
+      }
+    } catch (err) {
+      // If validation fails, catch the error and set error state
+      if (err instanceof z.ZodError) {
+        const tempError = { username: "", password: "" };
+        err.errors.forEach((error) => {
+          if (error.path[0] === "username") {
+            tempError.username = error.message;
+          }
+          if (error.path[0] === "password") {
+            tempError.password = error.message;
+          }
+        });
+        setError(tempError);
+      }
     }
   };
 
@@ -41,17 +91,29 @@ export default function LoginForm({ onClick, toggleRegister }) {
             name="username"
             placeholder="Username or Email"
             value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            className="w-full border border-gray-500 px-[6px] py-[6px] text-xs"
+            onChange={handleChange} // Use handleChange here
+            className={`w-full border  px-[6px] py-[6px] text-xs ${
+              error?.username ? "border-red-500" : "border-gray-500"
+            }`}
           />
+          {error?.username && (
+            <div className="text-red-500 text-xs">{error.username}</div>
+          )}
+
           <input
             type="password"
             name="password"
             placeholder="Password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full border border-gray-500 px-[6px] py-[6px] text-xs"
+            onChange={handleChange} // Use handleChange here
+            className={`w-full border  px-[6px] py-[6px] text-xs ${
+              error?.password ? "border-red-500" : "border-gray-500"
+            }`}
           />
+          {error?.password && (
+            <div className="text-red-500 text-xs">{error.password}</div>
+          )}
+
           <button
             type="submit"
             className="w-full border border-gray-500 bg-blue-500 px-[6px] py-[6px] text-xs text-white font-bold uppercase shadow-md"

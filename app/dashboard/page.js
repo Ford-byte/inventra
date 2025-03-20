@@ -3,7 +3,6 @@ import useProductApiStore from "@/public/components/store/useProductApi";
 import useTransactionApi from "@/public/components/store/useTransactionApi";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { toast } from "react-toastify";
 
 export default function Page() {
   const { getTransactions } = useTransactionApi();
@@ -14,6 +13,17 @@ export default function Page() {
   const [inventoryValue, setInventoryValue] = useState(0);
   const [stockIn, setStockIn] = useState();
   const [sales, setSales] = useState();
+
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem("Token");
+    if (token) {
+      setIsAuthenticated(true);
+    } else {
+      setIsAuthenticated(false);
+    }
+  }, []);
 
   useEffect(() => {
     fetchData();
@@ -72,7 +82,11 @@ export default function Page() {
       total += item?.price * item?.stock_out;
     });
     setSales(total);
-  }
+  };
+
+  // if (!isAuthenticated) {
+  //   return <div>Please log in to access the dashboard.</div>;
+  // }
 
   return (
     <div className="container px-[8px]">
@@ -109,8 +123,10 @@ export default function Page() {
           </div>
           <div className="flex flex-col px-[12px]">
             <h2 className="Total Products">Inventory Value</h2>
-            <span className={`font-black ${inventoryValue ? "" : "animate-pulse"}`}>
-            ₱ {inventoryValue ? inventoryValue.toFixed(2) : "..."}
+            <span
+              className={`font-black ${inventoryValue ? "" : "animate-pulse"}`}
+            >
+              ₱ {inventoryValue ? inventoryValue.toFixed(2) : "..."}
             </span>
           </div>
         </div>
@@ -126,7 +142,9 @@ export default function Page() {
           </div>
           <div className="flex flex-col px-[12px]">
             <h2 className="Total Products">Stock</h2>
-            <span className={`font-black ${stockIn ? "" : "animate-pulse  "}`}>{stockIn ? stockIn : "..."}</span>
+            <span className={`font-black ${stockIn ? "" : "animate-pulse  "}`}>
+              {stockIn ? stockIn : "..."}
+            </span>
           </div>
         </div>
         <div className="w-full flex items-center border p-[12px]">
@@ -141,7 +159,9 @@ export default function Page() {
           </div>
           <div className="flex flex-col px-[12px]">
             <h2 className="Total Products">Stock Out</h2>
-            <span className={`font-black ${sales ? "" : "animate-pulse  "}`}>₱ {sales ? sales : "..."}</span>
+            <span className={`font-black ${sales ? "" : "animate-pulse  "}`}>
+              ₱ {sales ? sales : "..."}
+            </span>
           </div>
         </div>
       </div>

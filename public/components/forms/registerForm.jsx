@@ -2,22 +2,54 @@
 import { useState } from "react";
 import Image from "next/image";
 import useUserApiStore from "../store/useUserApi";
+import { z } from "zod";
 
 export default function RegisterForm({ onClick, toggleLogin }) {
   const { createAccount } = useUserApiStore();
 
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [fullname, setFullname] = useState("");
-  const [email, setEmail] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
+  const [formData, setFormData] = useState({
+    username: "",
+    password: "",
+    fullname: "",
+    email: "",
+    phoneNumber: "",
+  });
+
+  const { username, password, fullname, email, phoneNumber } = formData;
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+
+    setError((prevError) => ({
+      ...prevError,
+      [name]: undefined,
+    }));
+  };
+
+  const formSchema = z.object({
+    username: z.string().min(3, "Username should be at least 3 characters"),
+    password: z.string().min(6, "Password should be at least 6 characters"),
+    fullname: z.string().min(1, "Full Name is required"),
+    email: z.string().email("Invalid email address"),
+    phoneNumber: z
+      .string()
+      .min(10, "Phone number should be at least 10 digits"),
+  });
+
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState({});
   const [successMessage, setSuccessMessage] = useState("");
 
   const handleRegister = async () => {
     setLoading(true);
+    setError({}); // Reset errors before validation
     try {
+      formSchema.parse(formData); // Validate form data
+
       const response = await createAccount({
         username,
         password,
@@ -27,8 +59,16 @@ export default function RegisterForm({ onClick, toggleLogin }) {
       });
 
       setSuccessMessage("Account created successfully!");
-    } catch (error) {
-      setError("An error occurred. Please try again.");
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        const newError = {};
+        err.errors.forEach((e) => {
+          newError[e.path[0]] = e.message;
+        });
+        setError(newError);
+      } else {
+        setError({ general: "An error occurred during registration." });
+      }
     } finally {
       setLoading(false);
     }
@@ -47,6 +87,13 @@ export default function RegisterForm({ onClick, toggleLogin }) {
         />
         <h2 className="text-xs uppercase">Register</h2>
 
+        {successMessage && (
+          <div className="text-green-500 text-sm">{successMessage}</div>
+        )}
+        {error.general && (
+          <div className="text-red-500 text-sm">{error.general}</div>
+        )}
+
         <form
           className="py-[12px] flex flex-col gap-y-[6px]"
           onSubmit={(e) => {
@@ -59,41 +106,71 @@ export default function RegisterForm({ onClick, toggleLogin }) {
             name="fullname"
             placeholder="Full Name"
             value={fullname}
-            onChange={(e) => setFullname(e.target.value)}
-            className="w-full border border-gray-500 px-[6px] py-[6px] text-xs"
+            onChange={handleChange}
+            className={`w-full border px-[6px] py-[6px] text-xs ${
+              error.fullname ? "border-red-500" : "border-gray-500"
+            }`}
           />
+          {error.fullname && (
+            <div className="text-red-500 text-xs">{error.fullname}</div>
+          )}
+
           <input
-            type="text"
+            type="email"
             name="email"
             placeholder="Email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full border border-gray-500 px-[6px] py-[6px] text-xs"
+            onChange={handleChange}
+            className={`w-full border px-[6px] py-[6px] text-xs ${
+              error.email ? "border-red-500" : "border-gray-500"
+            }`}
           />
+          {error.email && (
+            <div className="text-red-500 text-xs">{error.email}</div>
+          )}
+
           <input
             type="text"
             name="phoneNumber"
             placeholder="Phone Number"
             value={phoneNumber}
-            onChange={(e) => setPhoneNumber(e.target.value)}
-            className="w-full border border-gray-500 px-[6px] py-[6px] text-xs"
+            onChange={handleChange}
+            className={`w-full border px-[6px] py-[6px] text-xs ${
+              error.phoneNumber ? "border-red-500" : "border-gray-500"
+            }`}
           />
+          {error.phoneNumber && (
+            <div className="text-red-500 text-xs">{error.phoneNumber}</div>
+          )}
+
           <input
             type="text"
             name="username"
             placeholder="Username or Email"
             value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            className="w-full border border-gray-500 px-[6px] py-[6px] text-xs"
+            onChange={handleChange}
+            className={`w-full border px-[6px] py-[6px] text-xs ${
+              error.username ? "border-red-500" : "border-gray-500"
+            }`}
           />
+          {error.username && (
+            <div className="text-red-500 text-xs">{error.username}</div>
+          )}
+
           <input
             type="password"
             name="password"
             placeholder="Password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full border border-gray-500 px-[6px] py-[6px] text-xs"
+            onChange={handleChange}
+            className={`w-full border px-[6px] py-[6px] text-xs ${
+              error.password ? "border-red-500" : "border-gray-500"
+            }`}
           />
+          {error.password && (
+            <div className="text-red-500 text-xs">{error.password}</div>
+          )}
+
           <button
             type="submit"
             className={`w-full border border-gray-500 ${

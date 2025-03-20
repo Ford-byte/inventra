@@ -28,18 +28,17 @@ export default function TransactionTable(props) {
 
   const handlePageDown = () => {
     if (offset > 0) {
-      setOffset(offset - limit);
+      setOffset(offset - limit - 1);
       setPageCount(pageCount - 1);
     }
   };
 
   const handlePageUp = () => {
     if (products.length === limit) {
-      setOffset(offset + limit);
+      setOffset(offset + limit + 1);
       setPageCount(pageCount + 1);
     }
   };
-
 
   return (
     <div className="bg-white dark:bg-neutral-700 w-full py-[12px] mb-[100px]">
@@ -101,8 +100,7 @@ export default function TransactionTable(props) {
         className="mt-5 flex items-center justify-between text-sm"
         aria-label="Page navigation example"
       >
-        <p>
-        </p>
+        <p></p>
 
         <ul className="list-style-none flex">
           <li>
@@ -130,7 +128,7 @@ export default function TransactionTable(props) {
             <div
               className="relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300 hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
               onClick={handlePageUp}
-              disabled={offset + limit >= productLength}
+              disabled={offset + limit + 1 >= productLength}
             >
               {">"}
             </div>
